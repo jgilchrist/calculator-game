@@ -33,8 +33,11 @@ struct ProblemDefinition {
 struct State {
     value: i32,
     moves_left: i32,
-    ops_so_far: Vec<Op>,
+    ops_so_far: Vec<PastState>,
 }
+
+#[derive(Clone, Debug)]
+struct PastState(Op, i32);
 
 fn apply_op(value: i32, op: &Op) -> i32 {
     use Op::*;
@@ -54,7 +57,7 @@ fn generate_next_state(state: &State, op: &Op) -> State {
     let moves_left = state.moves_left - 1;
 
     let mut ops_so_far = state.ops_so_far.clone();
-    ops_so_far.push(op.clone());
+    ops_so_far.push(PastState(op.clone(), value));
 
     State {
         value,
@@ -112,17 +115,17 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
         state.ops_so_far.len().to_string().red(),
     );
 
-    for op in &state.ops_so_far {
-        let formatted_op = match *op {
-            Add(n) => format!("Add {}", n.to_string().green()),
-            Subtract(n) => format!("Subtract {}", n.to_string().green()),
-            Multiply(n) => format!("Multiply {}", n.to_string().green()),
-            Divide(n) => format!("Divide {}", n.to_string().green()),
-            Insert(n) => format!("Insert {}", n.to_string().green()),
-            Backspace => format!("{}", "Backspace".green()),
+    for past_state in &state.ops_so_far {
+        let formatted_op = match *past_state {
+            PastState(Add(n), _) => format!("Add {}", n.to_string().green()),
+            PastState(Subtract(n), _) => format!("Subtract {}", n.to_string().green()),
+            PastState(Multiply(n), _) => format!("Multiply {}", n.to_string().green()),
+            PastState(Divide(n), _) => format!("Divide {}", n.to_string().green()),
+            PastState(Insert(n), _) => format!("Insert {}", n.to_string().green()),
+            PastState(Backspace, _) => format!("{}", "Backspace".green()),
         };
 
-        println!("  - {}", formatted_op);
+        println!("  - {} = {}", formatted_op, past_state.1.to_string().yellow());
     }
 
     println!();
