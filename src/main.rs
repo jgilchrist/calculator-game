@@ -75,8 +75,12 @@ fn generate_successors(state: &State, problem_definition: &ProblemDefinition) ->
 }
 
 fn search(state: &State, problem_definition: &ProblemDefinition) {
-    if state.value == problem_definition.goal { print_result(state, problem_definition); }
-    if state.moves_left == 0 { return; }
+    if state.value == problem_definition.goal {
+        print_result(state, problem_definition);
+    }
+    if state.moves_left == 0 {
+        return;
+    }
 
     let states = generate_successors(state, problem_definition);
     for ref state in states {
@@ -85,7 +89,9 @@ fn search(state: &State, problem_definition: &ProblemDefinition) {
 }
 
 fn get_problem_definition() -> ProblemDefinition {
-    let filename = env::args().nth(1).expect("please specify a problem definition file");
+    let filename = env::args()
+        .nth(1)
+        .expect("please specify a problem definition file");
     let mut f = File::open(filename).expect("file not found");
 
     let mut contents = String::new();
@@ -99,10 +105,11 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
     use Op::*;
 
     println!();
-    println!("{} can be reached from {} in {} moves",
-             problem_definition.goal.to_string().blue(),
-             problem_definition.start.to_string().blue(),
-             state.ops_so_far.len().to_string().red(),
+    println!(
+        "{} can be reached from {} in {} moves",
+        problem_definition.goal.to_string().blue(),
+        problem_definition.start.to_string().blue(),
+        state.ops_so_far.len().to_string().red(),
     );
 
     for op in &state.ops_so_far {
