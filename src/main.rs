@@ -125,7 +125,7 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             PastState(Backspace, _) => format!("{}", "Backspace".green()),
         };
 
-        println!("  - {} = {}", formatted_op, past_state.1.to_string().yellow());
+        println!("  - {:20} => {}", formatted_op, past_state.1.to_string().yellow());
     }
 
     println!();
