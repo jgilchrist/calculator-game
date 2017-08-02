@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jonny Gilchrist <jonnygilchrist@gmail.com>"]
 
 [dependencies]
+colored = "1.5.2"
 serde = "1.0.11"
 serde_derive = "1.0.11"
 toml = "0.4.4"

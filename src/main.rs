@@ -1,3 +1,4 @@
+extern crate colored;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -7,13 +8,16 @@ use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+use colored::*;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", content = "amount")]
 enum Op {
     Add(i32),
     Subtract(i32),
     Multiply(i32),
     Divide(i32),
+    Insert(i32),
     Backspace,
 }
 
@@ -25,28 +29,63 @@ struct ProblemDefinition {
     ops: Vec<Op>,
 }
 
+#[derive(Clone, Debug)]
 struct State {
-    current: i32,
+    value: i32,
     moves_left: i32,
     ops_so_far: Vec<Op>,
 }
 
-fn apply_op(value: i32, op: Op) -> i32 {
+fn apply_op(value: i32, op: &Op) -> i32 {
     use Op::*;
 
-    match op {
+    match *op {
         Add(n) => value + n,
         Subtract(n) => value - n,
         Multiply(n) => value * n,
         Divide(n) => value / n,
+        Insert(n) => value * 10 + n,
         Backspace => value / 10,
     }
 }
 
-fn generate_successors() {}
+fn generate_next_state(state: &State, op: &Op) -> State {
+    let value = apply_op(state.value, op);
+    let moves_left = state.moves_left - 1;
+
+    let mut ops_so_far = state.ops_so_far.clone();
+    ops_so_far.push(op.clone());
+
+    State {
+        value,
+        moves_left,
+        ops_so_far,
+    }
+}
+
+fn generate_successors(state: &State, problem_definition: &ProblemDefinition) -> Vec<State> {
+    let mut next_states: Vec<State> = vec![];
+
+    for ref op in problem_definition.ops.iter() {
+        let next_state = generate_next_state(state, op);
+        next_states.push(next_state);
+    }
+
+    next_states
+}
+
+fn search(state: &State, problem_definition: &ProblemDefinition) {
+    if state.value == problem_definition.goal { print_result(state, problem_definition); }
+    if state.moves_left == 0 { return; }
+
+    let states = generate_successors(state, problem_definition);
+    for ref state in states {
+        search(state, problem_definition);
+    }
+}
 
 fn get_problem_definition() -> ProblemDefinition {
-    let filename = env::args().nth(1).unwrap();
+    let filename = env::args().nth(1).expect("please specify a problem definition file");
     let mut f = File::open(filename).expect("file not found");
 
     let mut contents = String::new();
@@ -56,13 +95,42 @@ fn get_problem_definition() -> ProblemDefinition {
     toml::from_str(&contents).unwrap()
 }
 
+fn print_result(state: &State, problem_definition: &ProblemDefinition) {
+    use Op::*;
+
+    println!();
+    println!("{} can be reached from {} in {} moves",
+             problem_definition.goal.to_string().blue(),
+             problem_definition.start.to_string().blue(),
+             state.ops_so_far.len().to_string().red(),
+    );
+
+    for op in &state.ops_so_far {
+        let formatted_op = match *op {
+            Add(n) => format!("Add {}", n.to_string().green()),
+            Subtract(n) => format!("Subtract {}", n.to_string().green()),
+            Multiply(n) => format!("Multiply {}", n.to_string().green()),
+            Divide(n) => format!("Divide {}", n.to_string().green()),
+            Insert(n) => format!("Insert {}", n.to_string().green()),
+            Backspace => format!("{}", "Backspace".green()),
+        };
+
+        println!("  - {}", formatted_op);
+    }
+
+    println!();
+}
+
 fn main() {
     let problem_definition = get_problem_definition();
     println!("Problem definition: {:?}", problem_definition);
 
     let initial_state = State {
-        current: problem_definition.start,
+        value: problem_definition.start,
         moves_left: problem_definition.moves,
         ops_so_far: vec![],
     };
+    println!("Initial state: {:?}", initial_state);
+
+    search(&initial_state, &problem_definition);
 }
