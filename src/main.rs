@@ -67,14 +67,7 @@ fn generate_next_state(state: &State, op: &Op) -> State {
 }
 
 fn generate_successors(state: &State, problem_definition: &ProblemDefinition) -> Vec<State> {
-    let mut next_states: Vec<State> = vec![];
-
-    for op in &problem_definition.ops {
-        let next_state = generate_next_state(state, op);
-        next_states.push(next_state);
-    }
-
-    next_states
+    problem_definition.ops.iter().map(|op| generate_next_state(state, op)).collect()
 }
 
 fn search(state: &State, problem_definition: &ProblemDefinition) {
