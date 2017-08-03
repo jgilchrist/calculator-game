@@ -109,16 +109,18 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
     );
 
     for past_state in &state.ops_so_far {
-        let formatted_op = match *past_state {
-            PastState(Add(n), _) => format!("Add {}", n.to_string().green()),
-            PastState(Subtract(n), _) => format!("Subtract {}", n.to_string().green()),
-            PastState(Multiply(n), _) => format!("Multiply {}", n.to_string().green()),
-            PastState(Divide(n), _) => format!("Divide {}", n.to_string().green()),
-            PastState(Insert(n), _) => format!("Insert {}", n.to_string().green()),
-            PastState(Backspace, _) => format!("{}", "Backspace".green()),
+        let &PastState(ref op, ref value) = past_state;
+
+        let formatted_op = match *op {
+            Add(n) => format!("Add {}", n.to_string().green()),
+            Subtract(n) => format!("Subtract {}", n.to_string().green()),
+            Multiply(n) => format!("Multiply {}", n.to_string().green()),
+            Divide(n) => format!("Divide {}", n.to_string().green()),
+            Insert(n) => format!("Insert {}", n.to_string().green()),
+            Backspace => format!("{}", "Backspace".green()),
         };
 
-        println!("  - {:20} => {}", formatted_op, past_state.1.to_string().yellow());
+        println!("  - {:20} => {}", formatted_op, value.to_string().yellow());
     }
 
     println!();
