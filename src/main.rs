@@ -18,6 +18,7 @@ enum Op {
     Multiply(i32),
     Divide(i32),
     Insert(i32),
+    Transform(i32, i32),
     Backspace,
 }
 
@@ -48,6 +49,7 @@ fn apply_op(value: i32, op: &Op) -> i32 {
         Multiply(n) => value * n,
         Divide(n) => value / n,
         Insert(n) => format!("{}{}", value, n).parse::<i32>().unwrap(),
+        Transform(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string()).parse::<i32>().unwrap(),
         Backspace => value / 10,
     }
 }
@@ -117,6 +119,7 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             Multiply(n) => format!("Multiply {}", n.to_string().green()),
             Divide(n) => format!("Divide {}", n.to_string().green()),
             Insert(n) => format!("Insert {}", n.to_string().green()),
+            Transform(n, m) => format!("Transform {} -> {}", n.to_string().green(), m.to_string().green()),
             Backspace => format!("{}", "Backspace".green()),
         };
 
