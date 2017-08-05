@@ -47,7 +47,7 @@ fn apply_op(value: i32, op: &Op) -> i32 {
         Subtract(n) => value - n,
         Multiply(n) => value * n,
         Divide(n) => value / n,
-        Insert(n) => value * 10 + n,
+        Insert(n) => format!("{}{}", value, n).parse::<i32>().unwrap(),
         Backspace => value / 10,
     }
 }
