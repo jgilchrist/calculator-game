@@ -20,6 +20,7 @@ enum Op {
     Insert(i32),
     Transform(i32, i32),
     Exponent(u32),
+    Negate,
     Backspace,
 }
 
@@ -52,6 +53,7 @@ fn apply_op(value: i32, op: &Op) -> i32 {
         Insert(n) => format!("{}{}", value, n).parse::<i32>().unwrap(),
         Transform(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string()).parse::<i32>().unwrap(),
         Exponent(n) => value.pow(n),
+        Negate => -value,
         Backspace => value / 10,
     }
 }
@@ -123,6 +125,7 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             Insert(n) => format!("Insert {}", n.to_string().green()),
             Transform(n, m) => format!("Transform {} -> {}", n.to_string().green(), m.to_string().green()),
             Exponent(n) => format!("Exponent {}", n.to_string().green()),
+            Negate => format!("{}", "Negate".green()),
             Backspace => format!("{}", "Backspace".green()),
         };
 
