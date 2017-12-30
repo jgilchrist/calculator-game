@@ -1,0 +1,9 @@
+start = 1
+goal = 2
+moves = 4
+
+ops = [
+    { type = "Add", amount = 1 },
+    { type = "Subtract", amount = 1 },
+    { type = "Backspace" },
+]
