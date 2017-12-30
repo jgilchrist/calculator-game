@@ -51,7 +51,9 @@ fn apply_op(value: i32, op: &Op) -> i32 {
         Multiply(n) => value * n,
         Divide(n) => value / n,
         Insert(n) => format!("{}{}", value, n).parse::<i32>().unwrap(),
-        Transform(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string()).parse::<i32>().unwrap(),
+        Transform(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string())
+            .parse::<i32>()
+            .unwrap(),
         Exponent(n) => value.pow(n),
         Negate => -value,
         Backspace => value / 10,
@@ -73,7 +75,11 @@ fn generate_next_state(state: &State, op: &Op) -> State {
 }
 
 fn generate_successors(state: &State, problem_definition: &ProblemDefinition) -> Vec<State> {
-    problem_definition.ops.iter().map(|op| generate_next_state(state, op)).collect()
+    problem_definition
+        .ops
+        .iter()
+        .map(|op| generate_next_state(state, op))
+        .collect()
 }
 
 fn search(state: &State, problem_definition: &ProblemDefinition) {
@@ -123,7 +129,11 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             Multiply(n) => format!("Multiply {}", n.to_string().green()),
             Divide(n) => format!("Divide {}", n.to_string().green()),
             Insert(n) => format!("Insert {}", n.to_string().green()),
-            Transform(n, m) => format!("Transform {} -> {}", n.to_string().green(), m.to_string().green()),
+            Transform(n, m) => format!(
+                "Transform {} -> {}",
+                n.to_string().green(),
+                m.to_string().green()
+            ),
             Exponent(n) => format!("Exponent {}", n.to_string().green()),
             Negate => format!("{}", "Negate".green()),
             Backspace => format!("{}", "Backspace".green()),
