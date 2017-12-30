@@ -19,7 +19,7 @@ enum Op {
     Multiply(i32),
     Divide(i32),
     Insert(i32),
-    Transform(i32, i32),
+    Replace(i32, i32),
     Exponent(u32),
     Negate,
     Backspace,
@@ -51,7 +51,7 @@ fn apply_op(value: i32, op: &Op) -> i32 {
         Multiply(n) => value * n,
         Divide(n) => value / n,
         Insert(n) => format!("{}{}", value, n).parse::<i32>().unwrap(),
-        Transform(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string())
+        Replace(n, m) => str::replace(&value.to_string(), &n.to_string(), &m.to_string())
             .parse::<i32>()
             .unwrap(),
         Exponent(n) => value.pow(n),
@@ -117,12 +117,7 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
     use Op::*;
 
     println!();
-    println!(
-        "{} can be reached from {} in {} moves",
-        problem_definition.goal.to_string().blue(),
-        problem_definition.start.to_string().blue(),
-        state.ops_so_far.len().to_string().red(),
-    );
+    println!("- Start       => {}", problem_definition.start.to_string().red());
 
     for past_state in &state.ops_so_far {
         let &PastState(ref op, ref value) = past_state;
@@ -133,8 +128,8 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             Multiply(n) => format_action("Multiply ", n),
             Divide(n) => format_action("Divide ", n),
             Insert(n) => format_action("Insert ", n),
-            Transform(n, m) => format!(
-                "Transform {} -> {}",
+            Replace(n, m) => format!(
+                "Replace {} -> {}",
                 n.to_string().green(),
                 m.to_string().green()
             ),
@@ -143,8 +138,10 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
             Backspace => format_action("", "Backspace"),
         };
 
-        println!("  - {:20} => {}", formatted_op, value.to_string().yellow());
+        println!("- {:20} => {}", formatted_op, value.to_string().yellow());
     }
+
+    println!("- Finish      => {}", problem_definition.goal.to_string().green());
 }
 
 fn main() {
