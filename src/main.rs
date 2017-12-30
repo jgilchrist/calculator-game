@@ -1,11 +1,12 @@
 extern crate colored;
 extern crate serde;
-#[macro_use]
-extern crate serde_derive;
 extern crate toml;
+
+#[macro_use] extern crate serde_derive;
 
 use std::env;
 use std::fs::File;
+use std::fmt::Display;
 use std::io::prelude::*;
 
 use colored::*;
@@ -86,6 +87,7 @@ fn search(state: &State, problem_definition: &ProblemDefinition) {
     if state.value == problem_definition.goal {
         print_result(state, problem_definition);
     }
+
     if state.moves_left == 0 {
         return;
     }
@@ -100,6 +102,7 @@ fn get_problem_definition() -> ProblemDefinition {
     let filename = env::args()
         .nth(1)
         .expect("please specify a problem definition file");
+
     let mut f = File::open(filename).expect("file not found");
 
     let mut contents = String::new();
@@ -107,6 +110,10 @@ fn get_problem_definition() -> ProblemDefinition {
         .expect("something went wrong reading the file");
 
     toml::from_str(&contents).unwrap()
+}
+
+fn format_action<T: Display>(action: &str, arg: T) -> String {
+    format!("{}{}", action, arg.to_string().green())
 }
 
 fn print_result(state: &State, problem_definition: &ProblemDefinition) {
@@ -124,25 +131,23 @@ fn print_result(state: &State, problem_definition: &ProblemDefinition) {
         let &PastState(ref op, ref value) = past_state;
 
         let formatted_op = match *op {
-            Add(n) => format!("Add {}", n.to_string().green()),
-            Subtract(n) => format!("Subtract {}", n.to_string().green()),
-            Multiply(n) => format!("Multiply {}", n.to_string().green()),
-            Divide(n) => format!("Divide {}", n.to_string().green()),
-            Insert(n) => format!("Insert {}", n.to_string().green()),
+            Add(n) => format_action("Add ", n),
+            Subtract(n) => format_action("Subtract ", n),
+            Multiply(n) => format_action("Multiply ", n),
+            Divide(n) => format_action("Divide ", n),
+            Insert(n) => format_action("Insert ", n),
             Transform(n, m) => format!(
                 "Transform {} -> {}",
                 n.to_string().green(),
                 m.to_string().green()
             ),
-            Exponent(n) => format!("Exponent {}", n.to_string().green()),
-            Negate => format!("{}", "Negate".green()),
-            Backspace => format!("{}", "Backspace".green()),
+            Exponent(n) => format_action("Exponent", n),
+            Negate => format_action("", "Negate"),
+            Backspace => format_action("", "Backspace"),
         };
 
         println!("  - {:20} => {}", formatted_op, value.to_string().yellow());
     }
-
-    println!();
 }
 
 fn main() {
