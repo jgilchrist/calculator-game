@@ -36,7 +36,6 @@ struct ProblemDefinition {
 #[derive(Clone, Debug)]
 struct State {
     value: i32,
-    moves_left: i32,
     ops_so_far: Vec<PastState>,
 }
 
@@ -63,14 +62,12 @@ fn apply_op(value: i32, op: &Op) -> i32 {
 
 fn generate_next_state(state: &State, op: &Op) -> State {
     let value = apply_op(state.value, op);
-    let moves_left = state.moves_left - 1;
 
     let mut ops_so_far = state.ops_so_far.clone();
     ops_so_far.push(PastState(op.clone(), value));
 
     State {
         value,
-        moves_left,
         ops_so_far,
     }
 }
@@ -83,18 +80,18 @@ fn generate_successors(state: &State, problem_definition: &ProblemDefinition) ->
         .collect()
 }
 
-fn search(state: &State, problem_definition: &ProblemDefinition) {
+fn search(state: &State, problem_definition: &ProblemDefinition, moves_left: i32) {
     if state.value == problem_definition.goal {
         print_result(state, problem_definition);
     }
 
-    if state.moves_left == 0 {
+    if moves_left == 0 {
         return;
     }
 
     let states = generate_successors(state, problem_definition);
     for state in &states {
-        search(state, problem_definition);
+        search(state, problem_definition, moves_left - 1);
     }
 }
 
@@ -156,10 +153,10 @@ fn main() {
 
     let initial_state = State {
         value: problem_definition.start,
-        moves_left: problem_definition.moves,
         ops_so_far: vec![],
     };
+
     println!("Initial state: {:?}", initial_state);
 
-    search(&initial_state, &problem_definition);
+    search(&initial_state, &problem_definition, problem_definition.moves);
 }
